@@ -47,7 +47,7 @@ cur = con.cursor() ## Definim el cursor
 
 #### Si aquest tros dóna problemes, es pot esborrar
 ## Comprovem si agafem un codi que ja estigui ocupat
-check='Select CodChannel from Channels'
+check='Select CodChannel from table_1'
 codis=cur.execute(check).fetchall() ## Executem la query i guardem el resultat
 
 llistacodis=[t[0] for t in codis] ## Agafem tots els codchannel
@@ -68,18 +68,18 @@ if app ==-1:
 
     if bandera==0:
 
-        test="Select * from NodesChannels where CodChannelChild=?"
+        test="Select * from table_2 where CodChannelChild=?"
         nom_org=cur.execute(test,codi).fetchall()
         toc=len(nom_org)
 
         if toc==1:
 
-            SQLTTV="Select MAX(Pos) from NodesChannels where CodChannel=10020"
+            SQLTTV="Select MAX(Pos) from table_2 where CodChannel=10020"
             fila=cur.execute(SQLTTV).fetchall()
             d=[l[0] for l in fila]
             posApp=d[0]+1
 
-            fila_nova=("Insert into NodesChannels Values ()")
+            fila_nova=("Insert into table_2 Values ()")
             cur.execute(fila_nova,codi)
 
 
@@ -88,12 +88,12 @@ if app ==-1:
 if bandera==0:
     ######### Agafem les dades que necessitem abans d'esborrar
     ## Primer la Channels
-    SQLdata="Select DateCreated from Channels where CodChannel=?" 
+    SQLdata="Select DateCreated from table_1 where CodChannel=?" 
     fila=cur.execute(SQLdata,codi).fetchall() 
     a=[j[0] for j in fila]
     data=a[0]
 
-    SQLposCh="Select Pos from Channels where CodChannel=?"
+    SQLposCh="Select Pos from table_1 where CodChannel=?"
     fila=cur.execute(SQLposCh, codi).fetchall()
     b=[k[0] for k in fila]
     posCh=b[0]
@@ -106,28 +106,28 @@ if bandera==0:
     #hi introduim les noves
     Ch=[codi,nom,nom,posCh,posBC+2000,data,dataformat]
 
-    SQL = "Insert into Channels Values ()"
+    SQL = "Insert into table_1 Values ()"
     cur.execute(SQL, Ch)
 
     BC=[codi,nom,nom,posBC]
 
-    SQL1= "Insert into BaseChannels Values ()"
+    SQL1= "Insert into table_2 Values ()"
     cur.execute(SQL1,BC)
 
     for i in range (1,19):
-        SQL2 = ("Insert into BaseSectorsBaseChannels Values ()")
+        SQL2 = ("Insert into table_5 Values ()")
         cur.execute(SQL2,BCBS)
 
-    SQL3 = "Insert into LinesChannels Values ()" 
+    SQL3 = "Insert into table_4 Values ()" 
     cur.execute(SQL3,LC)
 
     if app != -1:
-        SQL4 = ("Insert into NodesChannels Values ()")
+        SQL4 = ("Insert into table_3 Values ()")
         cur.execute(SQL4,NC)
     elif app == -1:
-         SQL4 = ("Insert into NodesChannels Values ()")
+         SQL4 = ("Insert into table_3 Values ()")
          cur.execute(SQL4,NC)
-         SQL5= ("Insert into NodesChannels Values ()")
+         SQL5= ("Insert into table_3 Values ()")
          cur.execute(SQL5,NC)
 
 # #queries per a afegir cadena
@@ -138,52 +138,52 @@ elif bandera==1:
 
 #### Agafem les dades de posició
 ##Channels
-    SQLposMCh="Select MAX(Pos) from Channels where Pos not like '999%'"
+    SQLposMCh="Select MAX(Pos) from table_1 where Pos not like '999%'"
     fila=cur.execute(SQLposMCh).fetchall()
     Mb=[k[0] for k in fila]
     posMCh=Mb[0]+1
 ##Base Channels
-    SQLposMBC="Select MAX(Pos) from BaseChannels"
+    SQLposMBC="Select MAX(Pos) from table_2"
     fila=cur.execute(SQLposMBC).fetchall()
     Me=[k[0] for k in fila]
     posMBC=Me[0]+1
 
-##L'estimada NodesChannels
-    SQLnoApp="Select MAX(Pos) from NodesChannels where CodChannel=10020"
+##L'estimada table_3
+    SQLnoApp="Select MAX(Pos) from table_3 where CodChannel=10020"
     fila=cur.execute(SQLnoApp).fetchall()
     a=[j[0] for j in fila]
     posi=a[0]+1
 
-    SQLTTV="Select MAX(Pos) from NodesChannels where CodChannel=10000"
+    SQLTTV="Select MAX(Pos) from table_3 where CodChannel=10000"
     fila=cur.execute(SQLTTV).fetchall()
     d=[l[0] for l in fila]
     posnoApp=d[0]+1
 
     Ch=[codi,nom,nom,posMCh,posMBC+2000,dataformat, dataformat]
 
-    SQL = "Insert into Channels Values ()" # your query goes here 
+    SQL = "Insert into table_1 Values ()" # your query goes here 
     cur.execute(SQL,Ch)
 
     BC=[codi,nom,nom,posMBC]
-    SQL1= "Insert into BaseChannels Values ()" ##Escrivim la query
+    SQL1= "Insert into table_2 Values ()" ##Escrivim la query
     cur.execute(SQL1,BC) ##L'executem
 
     for i in range (1,19):
-        SQL2 = ("Insert into BaseSectorsBaseChannels Values ()")
+        SQL2 = ("Insert into table_5 Values ()")
         cur.execute(SQL2,BCBS)
 
-    SQL3 = "Insert into LinesChannels Values ()"  
+    SQL3 = "Insert into table_4 Values ()"  
     cur.execute(SQL3,LC)
 
     if app != -1:
-        SQL4 = ("Insert into NodesChannels Values ()")
+        SQL4 = ("Insert into table_3 Values ()")
         cur.execute(SQL4,NC)
     elif app == -1:
         NC=[codi,posnoApp]
-        SQL4 = "Insert into NodesChannels Values ()" 
+        SQL4 = "Insert into table_3 Values ()" 
         cur.execute(SQL4,NC)
         NC=[codi,posi]
-        SQL5= "Insert into NodesChannels Values ()" 
+        SQL5= "Insert into table_3 Values ()" 
         cur.execute(SQL5,NC)
 
 #tanquem recursos
