@@ -37,9 +37,9 @@ LC=[codi,codi]
 app=nom.find("App")
 
 #set up some constants
-MDB = "path_to_mdb" ## Direcció del fitxer
-DRV = "mdb_driver" ##El driver
-PWD = "mdb_password" ## La clau de pas
+mdb = "path_to_mdb" ## Direcció del fitxer
+drv = "mdb_driver" ##El driver
+pwd = "mdb_password" ## La clau de pas
 
 # # connect to db
 con = pyodbc.connect('DRIVER;DBQ;PWD') ##Establim l'objecte de connexió
@@ -98,38 +98,10 @@ if bandera==0:
     b=[k[0] for k in fila]
     posCh=b[0]
 
-    ## Ara la BaseeChannels
-    SQLposBC="Select Pos from BaseChannels where CodChannelBase=?"
-    fila=cur.execute(SQLposBC, codi).fetchall()
-    e=[k[0] for k in fila]
-    posBC=e[0]
-
-    #### Això per a la nodes channels
-    SQLposTTV="Select Pos from NodesChannels where CodChannelChild=? and CodChannel=10000"
-    fila=cur.execute(SQLposTTV,codi).fetchall()
-    a=[j[0] for j in fila]
-    posNC=a[0]
-
-    SQLposnoApp="Select Pos from NodesChannels where CodChannelChild=? and CodChannel=10020"
-    fila=cur.execute(SQLposnoApp,codi).fetchall()
-    c=[k[0] for k in fila]
-    posNCnoApp=c[0]
 
     #esborrem les linies anteriors
-    BCesb= "Delete * from BaseChannels where CodChannelBase=?" 
+    BCesb= "Delete * from table_1 where column_1=?" 
     cur.execute(BCesb,codi)
-
-    LCesb= "Delete * from LinesChannels where CodChannelBase=?" 
-    cur.execute(LCesb,codi)
-
-    BSBCesb= "Delete * from BaseSectorsBaseChannels where CodChannelBase=?"
-    cur.execute(BSBCesb,codi)
-
-    Chesb="Delete * from Channels where CodChannel=?"
-    cur.execute(Chesb,codi)
-
-    NCesb="Delete * from NodesChannels where CodChannelChild=?"
-    cur.execute(NCesb,codi)
     
     #hi introduim les noves
     Ch=[codi,nom,nom,posCh,posBC+2000,data,dataformat]
