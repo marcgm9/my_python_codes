@@ -94,14 +94,12 @@ print("PER destriat")
 
 df_insertar=pd.DataFrame(llista_jsons)
 df_insertar=df_insertar.replace(" ",np.nan)
-df_insertar=df_insertar.dropna(subset=["first_name"])
+df_insertar=df_insertar.dropna(subset=["column_1"])
 print(df_insertar.head(5))
 job_config=bigquery.LoadJobConfig(
 schema=[
-    bigquery.SchemaField("person_id", "STRING"),
-    bigquery.SchemaField("name_id", "STRING"),
-    bigquery.SchemaField("first_name", "STRING"),
-    bigquery.SchemaField("last_name", "STRING"),
+    bigquery.SchemaField("", "STRING"),
+
 ],
 create_disposition = "CREATE_IF_NEEDED",
 )
@@ -121,7 +119,7 @@ with open(new_file_path,"w",encoding="utf-8") as xml_file:
             xml_file.write("\t\t<{}>{}</{}>\n".format(tag,value,tag))
         xml_file.write("\t</person>\n")
     xml_file.write("</person_file>")
-print("Ja hem insertat els nous person_id")
+print("Ja hem insertat els nous ")
 ## carreguem tot el PER a taula
 
 ################################################ fins aquí el que posarem a la cloud function
@@ -129,34 +127,32 @@ df=pd.DataFrame(llista_jsons)
 #%%
 ## df és el dataframe del PER i zz és el màster
 query="""
-select d.person_id as person_id_new, z.person_id as person_id_old, d.first_name as first_name_new, z.first_name as first_name_old, d.last_name as last_name_new, z.last_name as last_name_old
+select old
 from df as d
 inner join zz as z
-on d.person_id = z.person_id
-where d.first_name <> z.first_name or d.last_name <> z.last_name 
+on d.column_1 = z.column_1
+where d.column_2 <> z.column_2 or d.column_3 <> z.column_3
 """
 df_query=sqldf(query)
 
 print(df_query.head(10))
 # df_query=df_query.replace("None","")
 
-# df_query=df_query[~df_query['first_name_new'].str.contains('None')]
-# df_query=df_query[~df_query['first_name_old'].str.contains('None')]
-# df_query=df_query[~df_query['last_name_new'].str.contains('None')]
-# df_query=df_query['last_name_old'].replace("None","")
+# df_query=df_query[~df_query['column_2'].str.contains('None')]
+
 
 #%%
 ## Fem update dels person_id que vinguins amb un nom diferent del que tinguèssim al màster
 for index, row in df_query.iterrows():
     query_update="""update `{}`
 set first_name='{}', last_name='{}'
-where person_id='{}' """.format(table_id,row['first_name_new'], row['last_name_new'], row['person_id_old'])
+where person_id='{}' """.format(table_id,row['column_2'], row['column_3'], row['column_4'])
     bq_client.query(query_update)
 print("Master PER actualitzat")
 ## Escrivim l'xml que rebrà JMM
 dif=list(set(person_id_llista).difference(set(llista_bq)))
-dif=list(set(dif).union(set(df_query["person_id"].to_list())))
-tags=["name_id","person_id","first_name","last_name"]
+dif=list(set(dif).union(set(df_query["column_1"].to_list())))
+tags=["column_1","column_2","column_3","column_4"]
 
 arrel=ET.Element("person_file")
 node_file=ET.SubElement(arrel,"file")
